@@ -10,8 +10,7 @@ template <class... Ts>
 struct Multilambda : Ts... {
     using Ts::operator()...;
 };
-auto DrawConfig()
-{
+auto DrawConfig() {
     using namespace geometry;
     using namespace matplot;
 
@@ -30,7 +29,7 @@ auto DrawConfig()
 void Draw(std::span<geometry::Shape> shapes) {
     using namespace geometry;
     using namespace matplot;
-    const auto& fh = DrawConfig();
+    const auto &fh = DrawConfig();
     for (const auto &[index, shape] : std::ranges::views::enumerate(shapes)) {
         /**
          * @brief Для каждой фигуры примените `std::visit` с помощью мульти-лямбдs (Multilambda),
@@ -46,10 +45,35 @@ void Draw(std::span<geometry::Shape> shapes) {
          *        • RegularPolygon → "magenta"
          *        • Circle    → "red"
          *        • Polygon   → "cyan"
-         * 
+         *
          */
 
-        //ваш код тут
+        std::visit(Multilambda{[&](const Line &line) {
+                                   auto lines = line.Lines();
+                                   plot(lines.x, lines.y)->line_width(2).color("yellow");
+                               },
+                               [&](const Triangle &triangle) {
+                                   auto lines = triangle.Lines();
+                                   plot(lines.x, lines.y)->line_width(2).color("blue");
+                               },
+                               [&](const Rectangle &rect) {
+                                   auto lines = rect.Lines();
+                                   plot(lines.x, lines.y)->line_width(2).color("green");
+                               },
+                               [&](const RegularPolygon &polygon) {
+                                   auto lines = polygon.Lines();
+                                   plot(lines.x, lines.y)->line_width(2).color("magenta");
+                               },
+                               [&](const Circle &circle) {
+                                   auto lines = circle.Lines();
+                                   plot(lines.x, lines.y)->line_width(2).color("red");
+                               },
+                               [&](const Polygon &poly) {
+                                   auto lines = poly.Lines();
+                                   plot(lines.x, lines.y)->line_width(2).color("cyan");
+                               }},
+                   shape);
+
         // Add shape number
         const auto center = shape.visit([](auto &&s) { return s.Center(); });
         auto t = text(center.x, center.y, std::to_string(index));
@@ -64,8 +88,8 @@ void Draw(std::span<geometry::Shape> shapes) {
 void Draw(std::span<const geometry::triangulation::DelaunayTriangle> triangles) {
     using namespace geometry;
     using namespace matplot;
-    
-    const auto& fh = DrawConfig();
+
+    const auto &fh = DrawConfig();
 
     for (const auto &[index, d_triangle] : std::ranges::views::enumerate(triangles)) {
         const geometry::Triangle tri{d_triangle.a, d_triangle.b, d_triangle.c};

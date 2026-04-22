@@ -1,6 +1,4 @@
-#include "geometry.hpp"
-#include <gtest/gtest.h>
-
+#include "general_defines.hpp"
 #include "geometry.hpp"
 #include <gtest/gtest.h>
 
@@ -21,7 +19,7 @@ TEST(Point2DTest, OperatorsAndDistance) {
     EXPECT_DOUBLE_EQ(a.Cross(b), 1 * 6 - 2 * 4);
     EXPECT_DOUBLE_EQ(a.Length(), std::sqrt(1 * 1 + 2 * 2));
     EXPECT_DOUBLE_EQ(a.DistanceTo(b), std::sqrt(9 + 16));
-    EXPECT_NEAR(a.Normalize().Length(), 1.0, 1e-9);
+    EXPECT_NEAR(a.Normalize().Length(), 1.0, defs::epsilon);
 }
 
 TEST(LineTest, Properties) {
@@ -65,8 +63,8 @@ TEST(RegularPolygonTest, Vertices) {
     RegularPolygon p{{0, 0}, 1, 4};
     auto verts = p.Vertices();
     EXPECT_EQ(verts.size(), 4);
-    EXPECT_NEAR(verts[0].x, 1.0, 1e-9);
-    EXPECT_NEAR(verts[1].y, 1.0, 1e-9);
+    EXPECT_NEAR(verts[0].x, 1.0, defs::epsilon);
+    EXPECT_NEAR(verts[1].y, 1.0, defs::epsilon);
 }
 
 TEST(BoundingBoxTest, Overlaps) {

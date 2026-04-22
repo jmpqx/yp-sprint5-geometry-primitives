@@ -1,7 +1,4 @@
 #include "convex_hull.hpp"
-#include <gtest/gtest.h>
-
-#include "convex_hull.hpp"
 #include <expected>
 #include <gtest/gtest.h>
 #include <vector>

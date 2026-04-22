@@ -22,8 +22,10 @@ struct Point2D {
     constexpr Point2D(double x, double y) noexcept : x(x), y(y) {}
 
     // Comparison
-    constexpr bool operator<(const Point2D &other) const noexcept { return x < other.x && y < other.y; }
-    constexpr bool operator==(const Point2D &other) const noexcept { return x == other.x && y == other.y; }
+    [[nodiscard]] constexpr bool operator<(const Point2D &other) const noexcept { return x < other.x && y < other.y; }
+    [[nodiscard]] constexpr bool operator==(const Point2D &other) const noexcept {
+        return x == other.x && y == other.y;
+    }
 
     // Binary math operators
     [[nodiscard]] constexpr Point2D operator+(const Point2D &other) const noexcept {

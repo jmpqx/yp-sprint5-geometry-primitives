@@ -1,6 +1,3 @@
-#include "shape_utils.hpp"
-#include <gtest/gtest.h>
-
 #include "geometry.hpp"
 #include "shape_utils.hpp"
 #include <gtest/gtest.h>

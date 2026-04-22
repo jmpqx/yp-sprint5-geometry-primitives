@@ -11,6 +11,7 @@
 #include <print>
 #include <random>
 #include <ranges>
+#include <stdexcept>
 #include <variant>
 
 using namespace geometry;
@@ -31,7 +32,7 @@ void PrintAllIntersections(const Shape &shape, std::span<const Shape> others) {
      */
 
     if (!std::holds_alternative<Line>(shape) && !std::holds_alternative<Circle>(shape)) {
-        throw std::runtime_error("Intersections are only supported for Line and Circle shapes.");
+        throw std::logic_error("Intersections are only supported for Line and Circle shapes.");
     }
 
     auto supported_shapes = others | vs::filter([&](const auto &s) {
@@ -93,12 +94,17 @@ void PerformShapeAnalysis(std::span<const Shape> shapes) {
                                 return std::holds_alternative<Line>(s) || std::holds_alternative<Circle>(s);
                             });
 
+    if (std::distance(supported_shapes.begin(), supported_shapes.end()) < 2) {
+        std::println("Недостаточно фигур для вычисления расстояния между ними");
+        return;
+    }
+
     std::vector<std::reference_wrapper<const Shape>> selected_shapes;
     rs::sample(supported_shapes, std::back_inserter(selected_shapes), 2, std::mt19937{std::random_device{}()});
 
     if (auto distance = queries::DistanceBetweenShapes(selected_shapes[0], selected_shapes[1])) {
         std::println("Расстояние между фигурами {} и {} равно {:.2f}", selected_shapes[0].get(),
-                     selected_shapes[1].get(), *distance);
+                     selected_shapes[1].get(), distance.value());
     } else {
         std::println("Расстояние между фигурами {} и {} не может быть вычислено", selected_shapes[0].get(),
                      selected_shapes[1].get());
@@ -121,8 +127,8 @@ void PerformExtraShapeAnalysis(std::span<const Shape> shapes) {
         });
 
     const auto &[min, max] = rs::minmax_element(heights_and_shapes, {}, [](const auto &pair) { return pair.second; });
-    std::println("Фигура с наименьшей высотой: {}", *min);
-    std::println("Фигура с наибольшей высотой: {}", *max);
+    std::println("Фигура с наименьшей высотой: {}", (*min).first);
+    std::println("Фигура с наибольшей высотой: {}", (*max).first);
 
     auto above_threshold =
         heights_and_shapes | vs::filter([](const auto &pair) { return pair.second > 50.0; }) | vs::take(3);
@@ -177,8 +183,12 @@ int main() {
 
     auto convex_hull = convex_hull::GrahamScan(points);
     if (convex_hull) {
-        Polygon hull_polygon{convex_hull.value()};
+        auto convex_hull_val = convex_hull.value();
+        convex_hull_val.erase(convex_hull_val.begin());
+
+        Polygon hull_polygon{convex_hull_val};
         shapes.push_back(hull_polygon);
+
         visualization::Draw(shapes);
     }
 

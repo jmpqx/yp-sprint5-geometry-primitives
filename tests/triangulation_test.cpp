@@ -1,7 +1,4 @@
 #include "triangulation.hpp"
-#include <gtest/gtest.h>
-
-#include "triangulation.hpp"
 #include <expected>
 #include <gtest/gtest.h>
 #include <vector>
